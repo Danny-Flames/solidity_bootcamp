@@ -2,36 +2,35 @@
 pragma solidity ^0.8.18;
 
 contract ProposalContract {
-    address owner;
+    address public owner;
     uint256 private counter;
-    address[]  private voted_addresses;
+    address[] private voted_addresses;
 
     mapping(uint256 => Proposal) proposal_history;
 
     constructor() {
         owner = msg.sender;
-        voted_addresses.push(msg.sender);
+        voted_addresses.push(owner);
     }
 
     struct Proposal {
-        string title;  // Title of the proposal
-        string description; // Description of the proposal
-        uint256 approve; // Number of approve votes
-        uint256 reject; // Number of reject votes
-        uint256 pass; // Number of pass votes
-        uint256 total_vote_to_end; // When the total votes in the proposal reaches this limit, proposal ends
-        bool current_state; // This shows the current state of the proposal, meaning whether if passes of fails
-        bool is_active; // This shows if others can vote to our contract
+        string title;
+        string description;
+        uint256 approve;
+        uint256 reject;
+        uint256 pass;
+        uint256 total_vote_to_end;
+        bool current_state;
+        bool is_active;
     }
 
     modifier onlyOwner() {
-        require(msg.sender == owner);
+        require(msg.sender == owner, "Only the owner can perform this operation");
         _;
     }
 
-    
-    modifier active() {
-        require(proposal_history[counter].is_active == true, "The proposal is not active");
+    modifier active(uint256 _counter) {
+        require(proposal_history[_counter].is_active, "The proposal is not active");
         _;
     }
 
@@ -40,9 +39,8 @@ contract ProposalContract {
         _;
     }
 
-
-    function create(string calldata _title, string calldata _description, uint256 _total_vote_to_end) external onlyOwner  {
-        counter += 1;
+    function create(string calldata _title, string calldata _description, uint256 _total_vote_to_end) external onlyOwner {
+        counter++;
         proposal_history[counter] = Proposal(_title, _description, 0, 0, 0, _total_vote_to_end, false, true);
     }
 
@@ -50,8 +48,8 @@ contract ProposalContract {
         owner = new_owner;
     }
 
-    function calculateCurrentState() private view returns(bool) {
-        Proposal storage proposal = proposal_history[counter];
+    function calculateCurrentState(uint256 _counter) private view returns(bool) {
+        Proposal storage proposal = proposal_history[_counter];
 
         uint256 totalVotes = proposal.approve + proposal.reject + proposal.pass;
         uint256 passThreshold = (proposal.total_vote_to_end / 2) + 1;
@@ -67,39 +65,34 @@ contract ProposalContract {
     }
 
     function vote(uint8 choice) external {
-        // First part
         Proposal storage proposal = proposal_history[counter];
         uint256 total_vote = proposal.approve + proposal.reject + proposal.pass;
 
         voted_addresses.push(msg.sender);
 
-        // Second part
         if (choice == 1) {
-            proposal.approve += 1;
-            proposal.current_state = calculateCurrentState();
+            proposal.approve++;
+            proposal.current_state = calculateCurrentState(counter);
         } else if (choice == 2) {
-            proposal.reject += 1;
-            proposal.current_state = calculateCurrentState();
+            proposal.reject++;
+            proposal.current_state = calculateCurrentState(counter);
         } else if (choice == 0) {
-            proposal.pass += 1;
-            proposal.current_state = calculateCurrentState();
+            proposal.pass++;
+            proposal.current_state = calculateCurrentState(counter);
         }
 
-        // Third part
         if ((proposal.total_vote_to_end - total_vote == 1) && (choice == 1 || choice == 2 || choice == 0)) {
             proposal.is_active = false;
             voted_addresses = [owner];
         }
     }
 
-    function teminateProposal() external onlyOwner active {
+    function teminateProposal() external onlyOwner active(counter) {
         proposal_history[counter].is_active = false;
     }
 
-    // ****************** Query Functions ***********************
-
     function isVoted(address _address) public view returns (bool) {
-        for (uint i = 0; i < voted_addresses.length; i++) {
+        for (uint256 i = 0; i < voted_addresses.length; i++) {
             if (voted_addresses[i] == _address) {
                 return true;
             }

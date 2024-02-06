@@ -169,6 +169,19 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -230,11 +243,11 @@
 	},
 	"sources": {
 		"ProposalContract.sol": {
-			"keccak256": "0x8876fb8f2ccf70b43785921dca9c85cf0307b5dd69b96e9c986a620f90558896",
+			"keccak256": "0x6ed49ca659c92a3bf4af55d4b80b220e06bc77bad7068c6e449bfeb37056103d",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://7206bd0b6adcad8eba6394ba670194ad79740d92e39671f1712ff8f8aa7b9a14",
-				"dweb:/ipfs/QmZf41cdQDwg7YYc6AXvbENmf16oaWPGbLq5GyTxwLnMYh"
+				"bzz-raw://bf8a51fa13907c0eebc284c8f90b45b2dc0d9e95f5b2f94a6d1e2ba809772a9d",
+				"dweb:/ipfs/QmdiNMPvgYguk6xwf4aznLCt2vEVZmVjayn47T3qVBgBBj"
 			]
 		}
 	},
